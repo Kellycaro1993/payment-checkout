@@ -1,5 +1,6 @@
 import { useEffect, useState, type FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { paymentService } from '../../features/checkout/paymentService';
 
 import type { AppDispatch, RootState } from '../../app/store';
 import type { CheckoutItem } from '../../components/CheckoutModal/CheckoutModal.types';
@@ -47,19 +48,38 @@ export const ProductPage: FC = () => {
       customerId: customer.id,
     });
 
-    console.log('Customer created:', customer);
-    console.log('Delivery created:', delivery);
+    const [expMonth, expYear] = data.cardExpiration.split('/');
 
-    /*
-     * El siguiente paso será crear la transacción
-     * usando:
-     *
-     * customer.id
-     * delivery.id
-     * data.productId
-     *
-     * y después integrar el token de la tarjeta.
-     */
+    const cardToken = await paymentService.tokenizeCard({
+      number: data.cardNumber,
+      cvc: data.cardCvv,
+      expMonth,
+      expYear,
+      cardHolder: data.cardHolder,
+    });
+
+    const acceptanceTokens =
+      await paymentService.getAcceptanceTokens();
+
+    const transaction =
+      await checkoutService.createTransaction({
+        productId: data.productId,
+        customerId: customer.id,
+        deliveryId: delivery.id,
+        customerEmail: data.customerEmail,
+        cardToken,
+        installments: data.installments,
+        reference: `payment-${Date.now()}`,
+        acceptanceToken: acceptanceTokens.acceptanceToken,
+        acceptPersonalAuth:
+          acceptanceTokens.acceptPersonalAuth,
+      });
+
+    console.log('Transaction:', transaction);
+
+    await dispatch(fetchProducts());
+
+    setSelectedProduct(null);
   };
 
   return (

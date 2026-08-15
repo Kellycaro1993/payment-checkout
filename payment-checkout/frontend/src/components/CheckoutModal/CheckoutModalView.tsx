@@ -77,10 +77,13 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <input
                 className="CheckoutModal__input"
                 id="customerName"
+                autoComplete="name"
+                minLength={2}
                 name="customerName"
                 onChange={onChange}
                 placeholder="Nombre completo"
                 required
+                title="Ingresa al menos 2 caracteres."
                 type="text"
                 value={formData.customerName}
               />
@@ -97,10 +100,12 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <input
                 className="CheckoutModal__input"
                 id="customerEmail"
+                autoComplete="email"
                 name="customerEmail"
                 onChange={onChange}
                 placeholder="correo@ejemplo.com"
                 required
+                title="Ingresa un correo electrónico válido."
                 type="email"
                 value={formData.customerEmail}
               />
@@ -117,10 +122,15 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <input
                 className="CheckoutModal__input"
                 id="customerPhone"
+                autoComplete="tel"
+                inputMode="numeric"
+                maxLength={10}
                 name="customerPhone"
                 onChange={onChange}
+                pattern="[0-9]{10}"
                 placeholder="3001234567"
                 required
+                title="Ingresa un número de teléfono de 10 dígitos."
                 type="tel"
                 value={formData.customerPhone}
               />
@@ -141,10 +151,13 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <input
                 className="CheckoutModal__input"
                 id="address"
+                autoComplete="street-address"
+                minLength={5}
                 name="address"
                 onChange={onChange}
                 placeholder="Calle 123 #45-67"
                 required
+                title="Ingresa una dirección de al menos 5 caracteres."
                 type="text"
                 value={formData.address}
               />
@@ -161,10 +174,13 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <input
                 className="CheckoutModal__input"
                 id="city"
+                autoComplete="address-level2"
+                minLength={2}
                 name="city"
                 onChange={onChange}
                 placeholder="Bogotá"
                 required
+                title="Ingresa una ciudad de al menos 2 caracteres."
                 type="text"
                 value={formData.city}
               />
@@ -185,11 +201,15 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <input
                 className="CheckoutModal__input"
                 id="cardNumber"
+                autoComplete="cc-number"
+                inputMode="numeric"
                 maxLength={16}
                 name="cardNumber"
                 onChange={onChange}
+                pattern="[0-9]{16}"
                 placeholder="4111111111111111"
                 required
+                title="Ingresa los 16 dígitos de la tarjeta."
                 type="text"
                 value={formData.cardNumber}
               />
@@ -206,10 +226,13 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <input
                 className="CheckoutModal__input"
                 id="cardHolder"
+                autoComplete="cc-name"
+                minLength={3}
                 name="cardHolder"
                 onChange={onChange}
                 placeholder="Nombre completo"
                 required
+                title="Ingresa el nombre del titular como aparece en la tarjeta."
                 type="text"
                 value={formData.cardHolder}
               />
@@ -225,13 +248,16 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 </label>
 
                 <input
-                  className="CheckoutModal__input"
-                  id="cardExpiration"
-                  maxLength={5}
-                  name="cardExpiration"
-                  onChange={onChange}
-                  placeholder="MM/YY"
-                  required
+                className="CheckoutModal__input"
+                id="cardExpiration"
+                autoComplete="cc-exp"
+                maxLength={5}
+                name="cardExpiration"
+                onChange={onChange}
+                pattern="(0[1-9]|1[0-2])/[0-9]{2}"
+                placeholder="MM/YY"
+                required
+                title="Usa el formato MM/AA, por ejemplo 08/28."
                   type="text"
                   value={formData.cardExpiration}
                 />
@@ -246,13 +272,17 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 </label>
 
                 <input
-                  className="CheckoutModal__input"
-                  id="cardCvv"
-                  maxLength={3}
-                  name="cardCvv"
-                  onChange={onChange}
-                  placeholder="123"
-                  required
+                className="CheckoutModal__input"
+                id="cardCvv"
+                autoComplete="cc-csc"
+                inputMode="numeric"
+                maxLength={3}
+                name="cardCvv"
+                onChange={onChange}
+                pattern="[0-9]{3}"
+                placeholder="123"
+                required
+                title="Ingresa los 3 dígitos del CVV."
                   type="text"
                   value={formData.cardCvv}
                 />
@@ -270,8 +300,9 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               <select
                 className="CheckoutModal__input"
                 id="installments"
-                name="installments"
-                onChange={onChange}
+              name="installments"
+              onChange={onChange}
+              required
                 value={formData.installments}
               >
                 <option value={1}>1 cuota</option>
