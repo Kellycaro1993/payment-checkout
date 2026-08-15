@@ -1,7 +1,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import type { TransactionResponse } from '../../features/checkout/checkoutService';
 
-export type CheckoutStep = 'form' | 'summary';
+export type CheckoutStep = 'form' | 'summary' | 'result';
 export interface CheckoutFormData {
   customerName: string;
   customerEmail: string;
@@ -47,6 +47,7 @@ export interface CheckoutModalViewProps {
   productAmount: number;
   baseFee: number;
   deliveryFee: number;
+  transactionResult?: TransactionResponse | null;
   onBack: () => void;
   onConfirm: () => Promise<void>;
 

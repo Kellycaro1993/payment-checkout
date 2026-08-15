@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { CheckoutModal } from '../../components/CheckoutModal/CheckoutModal';
 import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { TransactionResultModal } from '../../components/TransactionResultModal/TransactionResultModal';
 import type { ProductPageViewProps } from './ProductPage.types';
 
 export const ProductPageView: FC<ProductPageViewProps> = ({
@@ -8,11 +9,12 @@ export const ProductPageView: FC<ProductPageViewProps> = ({
   isCheckoutOpen,
   loading,
   onCloseCheckout,
+  onCloseTransactionResult,
   onSelectProduct,
   onSubmitCheckout,
   products,
   selectedProduct,
-  transactionResult,
+  transactionResult
 }) => {
   if (loading) {
     return <main className="ProductPage__loading">Cargando productos...</main>;
@@ -46,6 +48,13 @@ export const ProductPageView: FC<ProductPageViewProps> = ({
           productId={selectedProduct.id}
           totalAmount={selectedProduct.price}
           transactionResult={transactionResult}
+        />
+      )}
+
+      {transactionResult && (
+        <TransactionResultModal
+          onClose={onCloseTransactionResult}
+          transaction={transactionResult}
         />
       )}
     </main>

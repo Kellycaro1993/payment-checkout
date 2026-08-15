@@ -1,0 +1,84 @@
+.TransactionResultModal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background-color: rgb(0 0 0 / 50%);
+}
+
+.TransactionResultModal__content {
+  width: min(100%, 440px);
+  padding: 36px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 10px 40px rgb(0 0 0 / 30%);
+  text-align: center;
+}
+
+.TransactionResultModal__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #e5f6ed;
+  color: #147a57;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.TransactionResultModal__status--declined {
+  background: #fceae8;
+  color: #c0392b;
+}
+
+.TransactionResultModal__title {
+  margin: 18px 0 0;
+  color: #147a57;
+  font-size: 26px;
+}
+
+.TransactionResultModal__title--declined {
+  color: #c0392b;
+}
+
+.TransactionResultModal__message {
+  max-width: 330px;
+  margin: 14px auto 0;
+  color: #4b5a54;
+  line-height: 1.5;
+}
+
+.TransactionResultModal__reference {
+  margin: 24px 0 28px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f4f7f5;
+  color: #526159;
+  font-size: 14px;
+}
+
+.TransactionResultModal__button {
+  min-width: 120px;
+  padding: 11px 24px;
+  border: 0;
+  border-radius: 4px;
+  background: #27ae60;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.TransactionResultModal__button:hover {
+  background: #229954;
+}
+
+@media (max-width: 480px) {
+  .TransactionResultModal__content {
+    padding: 28px 22px;
+  }
+}

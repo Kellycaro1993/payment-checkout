@@ -7,6 +7,7 @@ export interface ProductPageViewProps {
   isCheckoutOpen: boolean;
   loading: boolean;
   onCloseCheckout: () => void;
+  onCloseTransactionResult: () => void;
   onSelectProduct: (product: Product) => void;
   onSubmitCheckout: (data: CheckoutItem) => Promise<void>;
   products: Product[];

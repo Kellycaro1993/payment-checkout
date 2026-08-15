@@ -32,11 +32,16 @@ const [transactionResult, setTransactionResult] =
   }, [dispatch]);
 
   const handleSelectProduct = (product: Product) => {
+    setTransactionResult(null);
     setSelectedProduct(product);
   };
 
   const handleCloseCheckout = () => {
     setSelectedProduct(null);
+  };
+
+  const handleCloseTransactionResult = () => {
+    setTransactionResult(null);
   };
 
   const handleCheckout = async (data: CheckoutItem) => {
@@ -91,6 +96,7 @@ const [transactionResult, setTransactionResult] =
       isCheckoutOpen={selectedProduct !== null}
       loading={loading}
       onCloseCheckout={handleCloseCheckout}
+      onCloseTransactionResult={handleCloseTransactionResult}
       onSelectProduct={handleSelectProduct}
       onSubmitCheckout={handleCheckout}
       products={products}

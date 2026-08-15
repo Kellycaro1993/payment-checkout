@@ -1,3 +1,5 @@
+
+
 import type { FC } from 'react';
 import type { CheckoutModalViewProps } from './CheckoutModal.types';
 
@@ -29,6 +31,7 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
   onChange,
   onConfirm,
   onSubmit,
+  transactionResult
 }) => {
   if (!isOpen) {
     return null;
@@ -383,28 +386,28 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
 
             <div className="CheckoutModal__summary">
               <div className="CheckoutModal__summary-row">
-                <span>Producto</span>
+                <span>Producto:</span>
                 <span>
                   ${productAmount.toLocaleString('es-CO')}
                 </span>
               </div>
 
               <div className="CheckoutModal__summary-row">
-                <span>Tarifa base</span>
+                <span>Tarifa base:</span>
                 <span>
                   ${baseFee.toLocaleString('es-CO')}
                 </span>
               </div>
 
               <div className="CheckoutModal__summary-row">
-                <span>Envío</span>
+                <span>Envío:</span>
                 <span>
                   ${deliveryFee.toLocaleString('es-CO')}
                 </span>
               </div>
 
               <div className="CheckoutModal__summary-row CheckoutModal__summary-row--total">
-                <span>Total</span>
+                <span>Total:</span>
                 <span>
                   ${totalAmount.toLocaleString('es-CO')}
                 </span>
@@ -417,17 +420,17 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
 
             <div className="CheckoutModal__summary">
               <div className="CheckoutModal__summary-row">
-                <span>Cliente</span>
+                <span>Nombre:</span>
                 <span>{formData.customerName}</span>
               </div>
 
               <div className="CheckoutModal__summary-row">
-                <span>Dirección</span>
+                <span>Dirección:</span>
                 <span>{formData.address}</span>
               </div>
 
               <div className="CheckoutModal__summary-row">
-                <span>Ciudad</span>
+                <span>Ciudad:</span>
                 <span>{formData.city}</span>
               </div>
             </div>
@@ -449,6 +452,44 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 type="button"
               >
                 {loading ? 'Procesando...' : 'Pagar'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 'result' && transactionResult && (
+          <div className="CheckoutModal__body">
+            <div className="CheckoutModal__result">
+              <h3 className="CheckoutModal__subtitle">
+                {transactionResult.statusId === 2
+                  ? 'Pago aprobado'
+                  : 'Pago rechazado'}
+              </h3>
+
+              <p>
+                Transacción #{transactionResult.id}
+              </p>
+
+              <p>
+                Total: $
+                {transactionResult.totalAmount.toLocaleString('es-CO')}
+              </p>
+
+              <p>
+                Estado:{' '}
+                {transactionResult.statusId === 2
+                  ? 'APPROVED'
+                  : 'DECLINED'}
+              </p>
+            </div>
+
+            <div className="CheckoutModal__footer">
+              <button
+                className="CheckoutModal__button CheckoutModal__button--submit"
+                onClick={onClose}
+                type="button"
+              >
+                Volver a productos
               </button>
             </div>
           </div>

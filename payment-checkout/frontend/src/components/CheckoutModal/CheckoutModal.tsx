@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useState,
   type ChangeEvent,
   type FC,
@@ -80,6 +81,7 @@ export const CheckoutModal: FC<CheckoutModalProps> = ({
   onSubmit,
   totalAmount,
   productId,
+  transactionResult,
 }) => {
   const [formData, setFormData] =
     useState<CheckoutFormData>(INITIAL_FORM_DATA);
@@ -87,6 +89,7 @@ export const CheckoutModal: FC<CheckoutModalProps> = ({
   const [fieldErrors, setFieldErrors] = useState<CheckoutFieldErrors>({});
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [step, setStep] = useState<CheckoutStep>('form');
+  
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,) => {
     const { name, value } = event.target;
@@ -115,28 +118,11 @@ export const CheckoutModal: FC<CheckoutModalProps> = ({
     }));
   };
 
-  // const handleSubmit = async (
-  //    event: FormEvent<HTMLFormElement>,
-  // ) => {
-  //   event.preventDefault();
-
-  //   setLoading(true);
-
-  //   try {
-  //     await onSubmit({
-  //       productId,
-  //       amount: totalAmount,
-  //       ...formData,
-  //     });
-
-  //     setFormData(INITIAL_FORM_DATA);
-  //     onClose();
-  //   } catch (error) {
-  //     console.error('Checkout error:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  useEffect(() => {
+    if (transactionResult) {
+      setStep('result');
+    }
+  }, [transactionResult]);
 
   const handleClose = () => {
     setStep('form');
@@ -207,6 +193,7 @@ export const CheckoutModal: FC<CheckoutModalProps> = ({
       baseFee={BASE_FEE}
       deliveryFee={DELIVERY_FEE}
       totalAmount={totalAmount + BASE_FEE + DELIVERY_FEE}
+      transactionResult={transactionResult}
       onClose={handleClose}
       onBack={handleBack}
       onChange={handleChange}
