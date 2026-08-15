@@ -4,8 +4,13 @@ import { PrismaTransactionsRepository } from './repositories/prisma-transactions
 import { PaymentModule } from '../../infrastructure/integrations/payment/payment.module';
 import { PrismaModule } from '../../infrastructure/database/prisma/prisma.module';
 import { TransactionsService } from './services/transactions.service';
+import { ProductsModule } from '../products/products.module';
 @Module({
-    imports: [PaymentModule, PrismaModule],
+    imports: [
+        PaymentModule,
+        PrismaModule,
+        ProductsModule
+    ],
     providers: [
         {
         provide: TransactionsRepository,
