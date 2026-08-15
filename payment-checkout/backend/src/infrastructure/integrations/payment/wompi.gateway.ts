@@ -1,10 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { IPaymentGateway } from './payment.gateway';
+import {
+  PaymentGateway,
+  PaymentRequest,
+  PaymentResponse,
+} from './payment.gateway';
 
 @Injectable()
-export class WompiGateway implements IPaymentGateway {
-  async processPayment(amount: number, currency: string, data: any): Promise<any> {
-    // TODO: Implement Wompi payment processing
+export class WompiGateway implements PaymentGateway {
+  async processPayment(request: PaymentRequest): Promise<PaymentResponse> {
+    void request;
+
+    return {
+      success: false,
+      errorMessage: 'Wompi payment processing is not configured.',
+    };
   }
 
   async refundPayment(transactionId: string): Promise<any> {

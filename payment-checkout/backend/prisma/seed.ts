@@ -1,5 +1,6 @@
-import { PrismaClient } from '../generated/prisma/client';
+import 'dotenv/config';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaClient } from '../generated/prisma/client';
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL ?? 'file:./dev.db',
@@ -8,6 +9,20 @@ const adapter = new PrismaBetterSqlite3({
 const prisma = new PrismaClient({ adapter });
 
 async function main(): Promise<void> {
+    await prisma.transaction.deleteMany();
+    await prisma.delivery.deleteMany();
+    await prisma.customer.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.transactionStatus.deleteMany();
+    await prisma.transactionStatus.createMany({
+        data: [
+        { id: 1, name: 'PENDING' },
+        { id: 2, name: 'APPROVED' },
+        { id: 3, name: 'DECLINED' },
+        { id: 4, name: 'ERROR' },
+        ],
+    });
+
   await prisma.product.createMany({
     data: [
       {
