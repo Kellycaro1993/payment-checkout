@@ -1,3 +1,7 @@
-// Punto de entrada para las pruebas de CheckoutModal.
-// Se completará cuando se configure el runner de pruebas del proyecto.
-export {};
+import { describe, expect, it } from '@jest/globals';
+
+describe('CheckoutModal', () => {
+  it('ejecuta las pruebas de TypeScript correctamente', () => {
+    expect(true).toBe(true);
+  });
+});
