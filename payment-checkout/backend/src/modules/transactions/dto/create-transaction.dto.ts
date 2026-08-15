@@ -30,4 +30,16 @@ export class CreateTransactionDto {
   @IsInt()
   @Min(1)
   public installments!: number;
+
+  @IsString()
+  @IsNotEmpty()
+  public reference!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public acceptanceToken!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public acceptPersonalAuth!: string;
 }

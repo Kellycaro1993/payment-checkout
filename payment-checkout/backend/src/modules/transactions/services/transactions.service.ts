@@ -28,7 +28,7 @@ export class TransactionsService {
     productId: number,
     customerId: number,
     deliveryId: number,
-    payment: PaymentRequest,
+    payment: Omit<PaymentRequest, 'amount'>,
   ) {
     const product = await this.productsRepository.findById(productId);
 
