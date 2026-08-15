@@ -1,0 +1,9 @@
+# Variables de entorno y credenciales
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Mantener disponibles únicamente plantillas sin secretos
+!.env.example
+!**/.env.example
