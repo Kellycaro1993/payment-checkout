@@ -15,6 +15,24 @@ import type { CartItem } from './ProductPage.types';
 
 import './ProductPage.css';
 
+const CART_STORAGE_KEY = 'shopping-cart';
+
+const getStoredCartItems = (): CartItem[] => {
+  try {
+    const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+
+    if (!storedCart) {
+      return [];
+    }
+
+    const parsedCart: unknown = JSON.parse(storedCart);
+
+    return Array.isArray(parsedCart) ? parsedCart as CartItem[] : [];
+  } catch {
+    return [];
+  }
+};
+
 export const ProductPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -24,13 +42,22 @@ export const ProductPage: FC = () => {
 
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-const [transactionResult, setTransactionResult] =
-  useState<TransactionResponse | null>(null);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [transactionResult, setTransactionResult] =
+    useState<TransactionResponse | null>(null);
+  const [cartItems, setCartItems] = useState<CartItem[]>(getStoredCartItems);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      localStorage.removeItem(CART_STORAGE_KEY);
+      return;
+    }
+
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const handleAddToCart = (product: Product) => {
     setTransactionResult(null);
@@ -114,10 +141,7 @@ const [transactionResult, setTransactionResult] =
     });
 
   setTransactionResult(transaction);
-
-  if (transaction.statusId === 2) {
-    setCartItems([]);
-  }
+  setCartItems([]);
 
   console.log('Transaction:', transaction);
 };
