@@ -1,14 +1,64 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  ERROR
+}
+
+model Product {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String
+  price        Int
+  stock        Int
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Customer {
+  id          Int           @id @default(autoincrement())
+  name        String
+  email       String        @unique
+  phone       String
+  deliveries  Delivery[]
+  transactions Transaction[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Delivery {
+  id           Int         @id @default(autoincrement())
+  address      String
+  city         String
+  customerId   Int
+  customer     Customer    @relation(fields: [customerId], references: [id])
+  transaction  Transaction?
+  createdAt    DateTime    @default(now())
+}
+
+model Transaction {
+  id          Int               @id @default(autoincrement())
+  amount      Int
+  status      TransactionStatus @default(PENDING)
+  paymentId   String?
+  productId   Int
+  customerId  Int
+  deliveryId  Int               @unique
+
+  product     Product           @relation(fields: [productId], references: [id])
+  customer    Customer          @relation(fields: [customerId], references: [id])
+  delivery    Delivery          @relation(fields: [deliveryId], references: [id])
+
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
