@@ -36,8 +36,10 @@ const [transactionResult, setTransactionResult] =
     setSelectedProduct(product);
   };
 
-  const handleCloseCheckout = () => {
+  const handleCloseCheckout = async () => {
     setSelectedProduct(null);
+
+    await dispatch(fetchProducts());
   };
 
   const handleCloseTransactionResult = () => {
