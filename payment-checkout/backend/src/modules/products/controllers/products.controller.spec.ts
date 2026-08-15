@@ -1,38 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import type { Mocked } from 'jest-mock';
-import { ProductsService } from './products.service';
-import { ProductsRepository } from '../repositories/products.repository';
+import { ProductsController } from './products.controller';
+import { ProductsService } from '../services/products.service';
 
-describe('ProductsService', () => {
-  let service: ProductsService;
-  let repository: Mocked<ProductsRepository>;
+describe('ProductsController', () => {
+  let controller: ProductsController;
+  let service: Mocked<ProductsService>;
 
   beforeEach(async () => {
-    const mockRepository = {
-      findAll: jest.fn(),
-      findById: jest.fn(),
+    const mockProductsService = {
+      getProducts: jest.fn(),
+      getProductById: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [ProductsController],
       providers: [
-        ProductsService,
         {
-          provide: ProductsRepository,
-          useValue: mockRepository,
+          provide: ProductsService,
+          useValue: mockProductsService,
         },
       ],
     }).compile();
 
-    service = module.get<ProductsService>(ProductsService);
-    repository = module.get(ProductsRepository) as Mocked<ProductsRepository>;
+    controller = module.get<ProductsController>(ProductsController);
+    service = module.get(ProductsService) as Mocked<ProductsService>;
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 
   describe('getProducts', () => {
@@ -58,21 +58,12 @@ describe('ProductsService', () => {
         },
       ];
 
-      repository.findAll.mockResolvedValue(products);
+      service.getProducts.mockResolvedValue(products);
 
-      const result = await service.getProducts();
+      const result = await controller.getProducts();
 
       expect(result).toEqual(products);
-      expect(repository.findAll).toHaveBeenCalledTimes(1);
-    });
-
-    it('should return an empty array if no products exist', async () => {
-      repository.findAll.mockResolvedValue([]);
-
-      const result = await service.getProducts();
-
-      expect(result).toEqual([]);
-      expect(repository.findAll).toHaveBeenCalledTimes(1);
+      expect(service.getProducts).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -89,24 +80,25 @@ describe('ProductsService', () => {
         updatedAt: new Date(),
       };
 
-      repository.findById.mockResolvedValue(product);
+      service.getProductById.mockResolvedValue(product);
 
-      const result = await service.getProductById(productId);
+      const result = await controller.getProductById(productId);
 
       expect(result).toEqual(product);
-      expect(repository.findById).toHaveBeenCalledWith(productId);
-      expect(repository.findById).toHaveBeenCalledTimes(1);
+      expect(service.getProductById).toHaveBeenCalledWith(productId);
+      expect(service.getProductById).toHaveBeenCalledTimes(1);
     });
 
-    it('should return null if product does not exist', async () => {
+    it('should handle invalid product id', async () => {
       const productId = 999;
 
-      repository.findById.mockResolvedValue(null);
+      service.getProductById.mockResolvedValue(null);
 
-      const result = await service.getProductById(productId);
+      const result = await controller.getProductById(productId);
 
       expect(result).toBeNull();
-      expect(repository.findById).toHaveBeenCalledWith(productId);
+      expect(service.getProductById).toHaveBeenCalledWith(productId);
     });
   });
+});
 });
