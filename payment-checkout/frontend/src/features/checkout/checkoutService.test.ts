@@ -43,4 +43,12 @@ describe('checkoutService', () => {
     await expect(checkoutService.createTransaction(data)).resolves.toEqual(response);
     expect(post).toHaveBeenCalledWith('http://localhost:3000/transactions', data);
   });
+
+  it('crea una entrega para el cliente', async () => {
+    const delivery = { id: 1, address: 'Calle 10', city: 'Bogotá', customerId: 1 };
+    const post = jest.spyOn(axios, 'post').mockResolvedValue({ data: delivery });
+
+    await expect(checkoutService.createDelivery(delivery)).resolves.toEqual(delivery);
+    expect(post).toHaveBeenCalledWith('http://localhost:3000/deliveries', delivery);
+  });
 });

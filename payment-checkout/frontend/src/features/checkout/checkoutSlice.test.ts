@@ -4,6 +4,7 @@ import checkoutReducer, {
   setCheckoutError,
   setCheckoutLoading,
   setCheckoutSuccess,
+  setTransactionId,
 } from './checkoutSlice';
 
 describe('checkoutSlice', () => {
@@ -11,11 +12,13 @@ describe('checkoutSlice', () => {
     let state = checkoutReducer(undefined, setCheckoutLoading(true));
     state = checkoutReducer(state, setCheckoutError('Pago rechazado'));
     state = checkoutReducer(state, setCheckoutSuccess(true));
+    state = checkoutReducer(state, setTransactionId(10));
 
     expect(state).toMatchObject({
       loading: true,
       error: 'Pago rechazado',
       success: true,
+      transactionId: 10,
     });
 
     expect(checkoutReducer(state, resetCheckout())).toMatchObject({
