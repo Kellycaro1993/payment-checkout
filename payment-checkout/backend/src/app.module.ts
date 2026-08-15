@@ -4,12 +4,16 @@ import { AppService } from './app.service';
 import { PrismaModule } from './infrastructure/database/prisma/prisma.module';
 import { ProductsModule } from './modules/products/products.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
-
+import { CustomersModule } from './modules/customers/customers.module';
+import { DeliveriesModule } from './modules/deliveries/deliveries.module';
 @Module({
   imports: [
   PrismaModule,
   ProductsModule,
-  TransactionsModule
+  TransactionsModule,
+  CustomersModule,
+  DeliveriesModule,
+
 ],
   controllers: [AppController],
   providers: [

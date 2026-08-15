@@ -4,9 +4,11 @@ import { TransactionsService } from './transactions.service';
 import { TransactionsRepository } from '../repositories/transactions.repository';
 import { ProductsRepository } from '../../products/repositories/products.repository';
 import { PaymentGateway } from '../../../infrastructure/integrations/payment/payment.gateway';
+import { CustomersRepository } from '../../customers/repositories/customers.repository';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
+  let customersRepository: jest.Mocked<CustomersRepository>;
 
   let transactionsRepository: jest.Mocked<TransactionsRepository>;
   let productsRepository: jest.Mocked<ProductsRepository>;
@@ -18,6 +20,11 @@ describe('TransactionsService', () => {
       findById: jest.fn(),
       updateStatus: jest.fn(),
     };
+
+    customersRepository = {
+        findById: jest.fn(),
+        create: jest.fn(),
+        };
 
     productsRepository = {
       findAll: jest.fn(),
@@ -33,6 +40,7 @@ describe('TransactionsService', () => {
       transactionsRepository,
       productsRepository,
       paymentGateway,
+      customersRepository
     );
   });
 
@@ -92,7 +100,6 @@ describe('TransactionsService', () => {
         1,
         1,
         {
-          amount: 204900,
           customerEmail: 'test@example.com',
           cardToken: 'card-token-test',
           installments: 1,
@@ -187,7 +194,6 @@ describe('TransactionsService', () => {
         1,
         1,
         {
-          amount: 204900,
           customerEmail: 'test@example.com',
           cardToken: 'card-token-test',
           installments: 1,
@@ -218,7 +224,6 @@ describe('TransactionsService', () => {
           1,
           1,
           {
-            amount: 204900,
             customerEmail: 'test@example.com',
             cardToken: 'card-token-test',
             installments: 1,

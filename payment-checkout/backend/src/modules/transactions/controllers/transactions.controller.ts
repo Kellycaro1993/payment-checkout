@@ -1,31 +1,29 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { TransactionsService } from '../services/transactions.service';
-import { CreateTransactionDto } from '../dto/create-transaction.dto';
+import {CreateTransactionDto } from '../dto/create-transaction.dto';
 
 @Controller('transactions')
 export class TransactionsController {
-  constructor(
+  public constructor(
     private readonly transactionsService: TransactionsService,
   ) {}
 
   @Post()
-  async createTransaction(
-    @Body() createTransactionDto: CreateTransactionDto,
+  public async create(
+    @Body() dto: CreateTransactionDto,
   ) {
-    const { productId, customerId, deliveryId, ...paymentData } = createTransactionDto;
-
     return this.transactionsService.createTransaction(
-      productId,
-      customerId,
-      deliveryId,
-      paymentData,
+      dto.productId,
+      dto.customerId,
+      dto.deliveryId,
+      {
+        customerEmail: dto.customerEmail,
+        cardToken: dto.cardToken,
+        installments: dto.installments,
+        reference: dto.reference,
+        acceptanceToken: dto.acceptanceToken,
+        acceptPersonalAuth: dto.acceptPersonalAuth,
+      },
     );
-  }
-
-  @Get(':id')
-  async getTransaction(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    // TODO: Implement getTransaction
   }
 }

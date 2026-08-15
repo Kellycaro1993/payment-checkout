@@ -1,11 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductsRepository } from '../../products/repositories/products.repository';
 import { TransactionsRepository } from '../repositories/transactions.repository';
-import {
-  PaymentGateway,
-  PaymentRequest,
-} from '../../../infrastructure/integrations/payment/payment.gateway';
-
+import {PaymentGateway,PaymentRequest} from '../../../infrastructure/integrations/payment/payment.gateway';
+import { CustomersRepository } from '../../customers/repositories/customers.repository';
 const TRANSACTION_STATUS = {
   PENDING: 1,
   APPROVED: 2,
@@ -22,7 +19,9 @@ export class TransactionsService {
     private readonly transactionsRepository: TransactionsRepository,
     private readonly productsRepository: ProductsRepository,
     private readonly paymentGateway: PaymentGateway,
+    private readonly customersRepository: CustomersRepository,
   ) {}
+
 
   public async createTransaction(
     productId: number,
@@ -38,6 +37,12 @@ export class TransactionsService {
 
     if (product.stock <= 0) {
       throw new Error('Product is out of stock');
+    }
+
+    const customer = await this.customersRepository.findById(customerId);
+
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
     }
 
     const productAmount = product.price;
