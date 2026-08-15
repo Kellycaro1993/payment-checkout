@@ -48,7 +48,6 @@ describe('TransactionsController (e2e)', () => {
       totalAmount: 204900,
       paymentId: null,
       statusId: 1,
-      productId: 1,
       customerId: 1,
       deliveryId: 1,
       createdAt: new Date(),
@@ -58,7 +57,7 @@ describe('TransactionsController (e2e)', () => {
     transactionsService.createTransaction.mockResolvedValue(transaction);
 
     const dto = {
-      productId: 1,
+      items: [{ productId: 1, quantity: 1 }],
       customerId: 1,
       deliveryId: 1,
       customerEmail: 'test@example.com',
@@ -74,7 +73,7 @@ describe('TransactionsController (e2e)', () => {
     expect(result).toEqual(transaction);
 
     expect(transactionsService.createTransaction).toHaveBeenCalledWith(
-      dto.productId,
+      dto.items,
       dto.customerId,
       dto.deliveryId,
       {

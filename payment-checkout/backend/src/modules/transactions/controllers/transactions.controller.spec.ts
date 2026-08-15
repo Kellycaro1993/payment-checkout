@@ -25,7 +25,7 @@ describe('TransactionsController', () => {
   describe('create', () => {
     it('should create a transaction', async () => {
       const dto = {
-        productId: 1,
+        items: [{ productId: 1, quantity: 1 }],
         customerId: 1,
         deliveryId: 1,
         customerEmail: 'test@example.com',
@@ -49,7 +49,7 @@ describe('TransactionsController', () => {
 
       expect(service.createTransaction).toHaveBeenCalledTimes(1);
       expect(service.createTransaction).toHaveBeenCalledWith(
-        dto.productId,
+        dto.items,
         dto.customerId,
         dto.deliveryId,
         {

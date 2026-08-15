@@ -84,7 +84,7 @@ describe('TransactionsService', () => {
 
         await expect(
             service.createTransaction(
-            1,
+            [{ productId: 1, quantity: 1 }],
             1,
             1,
             {
@@ -120,7 +120,6 @@ describe('TransactionsService', () => {
         totalAmount: 204900,
         statusId: 1,
         paymentId: null,
-        productId: 1,
         customerId: 1,
         deliveryId: 1,
         createdAt: new Date(),
@@ -166,7 +165,7 @@ describe('TransactionsService', () => {
       });
 
       const result = await service.createTransaction(
-        1,
+        [{ productId: 1, quantity: 1 }],
         1,
         1,
         {
@@ -187,9 +186,9 @@ describe('TransactionsService', () => {
         deliveryFee: 10000,
         totalAmount: 204900,
         statusId: 1,
-        productId: 1,
         customerId: 1,
         deliveryId: 1,
+        items: [{ productId: 1, quantity: 1, unitPrice: 189900 }],
       });
 
       expect(paymentGateway.processPayment).toHaveBeenCalledWith({
@@ -230,7 +229,6 @@ describe('TransactionsService', () => {
         totalAmount: 204900,
         statusId: 1,
         paymentId: null,
-        productId: 1,
         customerId: 1,
         deliveryId: 1,
         createdAt: new Date(),
@@ -273,7 +271,7 @@ describe('TransactionsService', () => {
       );
 
       const result = await service.createTransaction(
-        1,
+        [{ productId: 1, quantity: 1 }],
         1,
         1,
         {
@@ -302,7 +300,7 @@ describe('TransactionsService', () => {
 
       await expect(
         service.createTransaction(
-          999,
+        [{ productId: 999, quantity: 1 }],
           1,
           1,
           {
