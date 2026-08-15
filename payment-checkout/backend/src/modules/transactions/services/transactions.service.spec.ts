@@ -93,10 +93,13 @@ describe('TransactionsService', () => {
         1,
         {
           amount: 204900,
-          cardNumber: '4111111111111111',
-          cardHolder: 'Test User',
-          cardExpiration: '12/30',
-          cardCvv: '123',
+          customerEmail: 'test@example.com',
+          cardToken: 'card-token-test',
+          installments: 1,
+          reference: 'TEST-TRANSACTION-001',
+          acceptanceToken: 'acceptance-token-test',
+          acceptPersonalAuth: 'personal-auth-test',
+         
         },
       );
 
@@ -115,10 +118,13 @@ describe('TransactionsService', () => {
 
       expect(paymentGateway.processPayment).toHaveBeenCalledWith({
         amount: 204900,
-        cardNumber: '4111111111111111',
-        cardHolder: 'Test User',
-        cardExpiration: '12/30',
-        cardCvv: '123',
+        customerEmail: 'test@example.com',
+        cardToken: 'card-token-test',
+        installments: 1,
+        reference: 'TEST-TRANSACTION-001',
+        acceptanceToken: 'acceptance-token-test',
+        acceptPersonalAuth: 'personal-auth-test',
+       
       });
 
       expect(productsRepository.updateStock).toHaveBeenCalledWith(1, 1);
@@ -182,10 +188,13 @@ describe('TransactionsService', () => {
         1,
         {
           amount: 204900,
-          cardNumber: '4111111111111111',
-          cardHolder: 'Test User',
-          cardExpiration: '12/30',
-          cardCvv: '123',
+          customerEmail: 'test@example.com',
+          cardToken: 'card-token-test',
+          installments: 1,
+          reference: 'TEST-TRANSACTION-001',
+          acceptanceToken: 'acceptance-token-test',
+          acceptPersonalAuth: 'personal-auth-test',
+         
         },
       );
 
@@ -210,10 +219,13 @@ describe('TransactionsService', () => {
           1,
           {
             amount: 204900,
-            cardNumber: '4111111111111111',
-            cardHolder: 'Test User',
-            cardExpiration: '12/30',
-            cardCvv: '123',
+            customerEmail: 'test@example.com',
+            cardToken: 'card-token-test',
+            installments: 1,
+            reference: 'TEST-TRANSACTION-001',
+            acceptanceToken: 'acceptance-token-test',
+            acceptPersonalAuth: 'personal-auth-test',
+           
           },
         ),
       ).rejects.toThrow(NotFoundException);

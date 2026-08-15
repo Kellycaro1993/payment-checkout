@@ -1,9 +1,11 @@
 export interface PaymentRequest {
   amount: number;
-  cardNumber: string;
-  cardHolder: string;
-  cardExpiration: string;
-  cardCvv: string;
+  customerEmail: string;
+  cardToken: string;
+  installments: number;
+  reference: string;
+  acceptanceToken: string;
+  acceptPersonalAuth: string;
 }
 
 export interface PaymentResponse {
