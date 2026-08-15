@@ -10,6 +10,7 @@ import { checkoutService } from '../../features/checkout/checkoutService';
 import { fetchProducts } from '../../features/products/productsSlice';
 
 import { ProductPageView } from './ProductPageView';
+import type { TransactionResponse } from '../../features/checkout/checkoutService';
 
 import './ProductPage.css';
 
@@ -20,8 +21,11 @@ export const ProductPage: FC = () => {
     (state: RootState) => state.products,
   );
 
-  const [selectedProduct, setSelectedProduct] =
-    useState<Product | null>(null);
+const [selectedProduct, setSelectedProduct] =
+  useState<Product | null>(null);
+
+const [transactionResult, setTransactionResult] =
+  useState<TransactionResponse | null>(null);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -36,51 +40,50 @@ export const ProductPage: FC = () => {
   };
 
   const handleCheckout = async (data: CheckoutItem) => {
-    const customer = await checkoutService.createCustomer({
-      name: data.customerName,
-      email: data.customerEmail,
-      phone: data.customerPhone,
-    });
+  const customer = await checkoutService.createCustomer({
+    name: data.customerName,
+    email: data.customerEmail,
+    phone: data.customerPhone,
+  });
 
-    const delivery = await checkoutService.createDelivery({
-      address: data.address,
-      city: data.city,
+  const delivery = await checkoutService.createDelivery({
+    address: data.address,
+    city: data.city,
+    customerId: customer.id,
+  });
+
+  const [expMonth, expYear] = data.cardExpiration.split('/');
+
+  const cardToken = await paymentService.tokenizeCard({
+    number: data.cardNumber,
+    cvc: data.cardCvv,
+    expMonth,
+    expYear,
+    cardHolder: data.cardHolder,
+  });
+
+  const acceptanceTokens =
+    await paymentService.getAcceptanceTokens();
+
+  const transaction =
+    await checkoutService.createTransaction({
+      productId: data.productId,
       customerId: customer.id,
+      deliveryId: delivery.id,
+      customerEmail: data.customerEmail,
+      cardToken,
+      installments: data.installments,
+      reference: `payment-${Date.now()}`,
+      acceptanceToken:
+        acceptanceTokens.acceptanceToken,
+      acceptPersonalAuth:
+        acceptanceTokens.acceptPersonalAuth,
     });
 
-    const [expMonth, expYear] = data.cardExpiration.split('/');
+  setTransactionResult(transaction);
 
-    const cardToken = await paymentService.tokenizeCard({
-      number: data.cardNumber,
-      cvc: data.cardCvv,
-      expMonth,
-      expYear,
-      cardHolder: data.cardHolder,
-    });
-
-    const acceptanceTokens =
-      await paymentService.getAcceptanceTokens();
-
-    const transaction =
-      await checkoutService.createTransaction({
-        productId: data.productId,
-        customerId: customer.id,
-        deliveryId: delivery.id,
-        customerEmail: data.customerEmail,
-        cardToken,
-        installments: data.installments,
-        reference: `payment-${Date.now()}`,
-        acceptanceToken: acceptanceTokens.acceptanceToken,
-        acceptPersonalAuth:
-          acceptanceTokens.acceptPersonalAuth,
-      });
-
-    console.log('Transaction:', transaction);
-
-    await dispatch(fetchProducts());
-
-    setSelectedProduct(null);
-  };
+  console.log('Transaction:', transaction);
+};
 
   return (
     <ProductPageView
@@ -92,6 +95,7 @@ export const ProductPage: FC = () => {
       onSubmitCheckout={handleCheckout}
       products={products}
       selectedProduct={selectedProduct}
+      transactionResult={transactionResult}
     />
   );
 };

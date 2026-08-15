@@ -12,6 +12,7 @@ export const ProductPageView: FC<ProductPageViewProps> = ({
   onSubmitCheckout,
   products,
   selectedProduct,
+  transactionResult,
 }) => {
   if (loading) {
     return <main className="ProductPage__loading">Cargando productos...</main>;
@@ -44,6 +45,7 @@ export const ProductPageView: FC<ProductPageViewProps> = ({
           onSubmit={onSubmitCheckout}
           productId={selectedProduct.id}
           totalAmount={selectedProduct.price}
+          transactionResult={transactionResult}
         />
       )}
     </main>

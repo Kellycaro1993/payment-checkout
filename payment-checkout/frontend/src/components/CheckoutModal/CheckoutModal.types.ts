@@ -1,4 +1,5 @@
 import type { ChangeEvent, FormEvent } from 'react';
+import type { TransactionResponse } from '../../features/checkout/checkoutService';
 
 export type CheckoutStep = 'form' | 'summary';
 export interface CheckoutFormData {
@@ -31,6 +32,7 @@ export interface CheckoutModalProps {
   onSubmit: (data: CheckoutItem) => Promise<void>;
   totalAmount: number;
   productId: number;
+  transactionResult?: TransactionResponse | null;
 }
 
 export interface CheckoutModalViewProps {
