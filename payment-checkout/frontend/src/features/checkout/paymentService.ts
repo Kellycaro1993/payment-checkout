@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const WOMPI_API_URL = import.meta.env.VITE_WOMPI_API_URL;
-const WOMPI_PUBLIC_KEY = import.meta.env.VITE_WOMPI_PUBLIC_KEY;
+const WOMPI_API_URL = import.meta.env?.VITE_WOMPI_API_URL;
+const WOMPI_PUBLIC_KEY = import.meta.env?.VITE_WOMPI_PUBLIC_KEY;
 
 export interface TokenizeCardPayload {
   number: string;

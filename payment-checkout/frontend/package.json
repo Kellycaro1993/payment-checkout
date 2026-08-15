@@ -8,8 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test": "node --no-warnings --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "test:coverage": "node --no-warnings --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.12.0",
@@ -26,6 +26,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "oxlint": "^1.75.0",

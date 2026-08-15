@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { Product } from './productsSlice';
 
 const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  import.meta.env?.VITE_API_URL || 'http://localhost:3000';
 
 export const productsService = {
   getProducts: async (): Promise<Product[]> => {
