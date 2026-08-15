@@ -59,6 +59,22 @@
   margin-bottom: 20px;
 }
 
+.CheckoutModal__amount {
+  margin: 0;
+  color: #147a57;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.CheckoutModal__fields {
+  display: flex;
+  gap: 12px;
+}
+
+.CheckoutModal__fields > .CheckoutModal__section {
+  flex: 1 1 0;
+}
+
 .CheckoutModal__label {
   display: block;
   font-size: 14px;
@@ -120,4 +136,30 @@
 .CheckoutModal__button--submit:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .CheckoutModal {
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  .CheckoutModal__content {
+    width: 100%;
+    max-height: 95vh;
+    padding: 20px;
+  }
+
+  .CheckoutModal__fields {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .CheckoutModal__footer {
+    flex-direction: column-reverse;
+  }
+
+  .CheckoutModal__button {
+    width: 100%;
+  }
 }

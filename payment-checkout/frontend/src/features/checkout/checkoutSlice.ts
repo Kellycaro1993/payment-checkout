@@ -1,50 +1,54 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 interface CheckoutState {
-  isLoading: boolean;
+  loading: boolean;
   error: string | null;
   success: boolean;
-  checkoutData: {
-    productId: number;
-    customerId: number;
-    deliveryId: number;
-    amount: number;
-    cardNumber: string;
-    cardHolder: string;
-    cardExpiration: string;
-    cardCvv: string;
-  } | null;
+  transactionId: number | null;
 }
 
 const initialState: CheckoutState = {
-  isLoading: false,
+  loading: false,
   error: null,
   success: false,
-  checkoutData: null,
+  transactionId: null,
 };
 
-export const checkoutSlice = createSlice({
+const checkoutSlice = createSlice({
   name: 'checkout',
+
   initialState,
+
   reducers: {
-    setCheckoutLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
+    setCheckoutLoading: (
+      state,
+      action: PayloadAction<boolean>,
+    ) => {
+      state.loading = action.payload;
     },
-    setCheckoutError: (state, action: PayloadAction<string | null>) => {
+
+    setCheckoutError: (
+      state,
+      action: PayloadAction<string | null>,
+    ) => {
       state.error = action.payload;
     },
-    setCheckoutSuccess: (state, action: PayloadAction<boolean>) => {
+
+    setCheckoutSuccess: (
+      state,
+      action: PayloadAction<boolean>,
+    ) => {
       state.success = action.payload;
     },
-    setCheckoutData: (state, action: PayloadAction<CheckoutState['checkoutData']>) => {
-      state.checkoutData = action.payload;
+
+    setTransactionId: (
+      state,
+      action: PayloadAction<number | null>,
+    ) => {
+      state.transactionId = action.payload;
     },
-    resetCheckout: (state) => {
-      state.isLoading = false;
-      state.error = null;
-      state.success = false;
-      state.checkoutData = null;
-    },
+
+    resetCheckout: () => initialState,
   },
 });
 
@@ -52,7 +56,7 @@ export const {
   setCheckoutLoading,
   setCheckoutError,
   setCheckoutSuccess,
-  setCheckoutData,
+  setTransactionId,
   resetCheckout,
 } = checkoutSlice.actions;
 
