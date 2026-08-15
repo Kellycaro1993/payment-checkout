@@ -17,6 +17,7 @@ import type {
 
 const BASE_FEE = 5000;
 const DELIVERY_FEE = 10000;
+const CHECKOUT_STORAGE_KEY = 'checkout-progress';
 
 const INITIAL_FORM_DATA: CheckoutFormData = {
   customerName: '',
@@ -80,7 +81,7 @@ export const CheckoutModal: FC<CheckoutModalProps> = ({
   onClose,
   onSubmit,
   totalAmount,
-  productId,
+  items,
   transactionResult,
 }) => {
   const [formData, setFormData] =
@@ -124,11 +125,62 @@ export const CheckoutModal: FC<CheckoutModalProps> = ({
     }
   }, [transactionResult]);
 
+
+
+  useEffect(() => {
+      const savedCheckout = localStorage.getItem(CHECKOUT_STORAGE_KEY);
+
+      if (!savedCheckout) {
+        return;
+      }
+
+      const parsed = JSON.parse(savedCheckout);
+
+      setFormData((previous) => ({
+        ...previous,
+        customerName: parsed.customerName ?? '',
+        customerEmail: parsed.customerEmail ?? '',
+        customerPhone: parsed.customerPhone ?? '',
+        address: parsed.address ?? '',
+        city: parsed.city ?? '',
+        installments: parsed.installments ?? 1,
+      }));
+
+      if (parsed.step === 'summary') {
+        setStep('summary');
+      }
+    }, []);
+
+  useEffect(() => {
+      localStorage.setItem(
+        CHECKOUT_STORAGE_KEY,
+        JSON.stringify({
+          customerName: formData.customerName,
+          customerEmail: formData.customerEmail,
+          customerPhone: formData.customerPhone,
+          address: formData.address,
+          city: formData.city,
+          installments: formData.installments,
+          step,
+        }),
+      );
+    }, [
+      formData.customerName,
+      formData.customerEmail,
+      formData.customerPhone,
+      formData.address,
+      formData.city,
+      formData.installments,
+      step,
+    ]);
+  
+
   const handleClose = () => {
     setStep('form');
     setFormData(INITIAL_FORM_DATA);
     setFieldErrors({});
     setPaymentError(null);
+    localStorage.removeItem(CHECKOUT_STORAGE_KEY);
     onClose();
   };
 
@@ -158,7 +210,7 @@ export const CheckoutModal: FC<CheckoutModalProps> = ({
 
     try {
       await onSubmit({
-        productId,
+        items,
         amount: totalAmount + BASE_FEE + DELIVERY_FEE,
         ...formData,
         cardNumber: formData.cardNumber.replaceAll(' ', ''),

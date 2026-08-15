@@ -23,12 +23,23 @@ export class PrismaTransactionsRepository implements TransactionsRepository {
     deliveryFee: number;
     totalAmount: number;
     statusId: number;
-    productId: number;
+    items: Array<{
+      productId: number;
+      quantity: number;
+      unitPrice: number;
+    }>;
     customerId: number;
     deliveryId: number;
   }): Promise<Transaction> {
+    const { items, ...transaction } = data;
+
     return this.prisma.transaction.create({
-      data,
+      data: {
+        ...transaction,
+        items: {
+          create: items,
+        },
+      },
     });
   }
 

@@ -18,7 +18,10 @@ export interface CheckoutFormData {
 }
 
 export interface CheckoutItem extends CheckoutFormData {
-  productId: number;
+  items: Array<{
+    productId: number;
+    quantity: number;
+  }>;
   amount: number;
 }
 
@@ -31,7 +34,7 @@ export interface CheckoutModalProps {
   onClose: () => void;
   onSubmit: (data: CheckoutItem) => Promise<void>;
   totalAmount: number;
-  productId: number;
+  items: CheckoutItem['items'];
   transactionResult?: TransactionResponse | null;
 }
 

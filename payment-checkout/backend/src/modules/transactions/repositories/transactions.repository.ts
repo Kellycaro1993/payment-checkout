@@ -7,7 +7,11 @@ export abstract class TransactionsRepository {
     deliveryFee: number;
     totalAmount: number;
     statusId: number;
-    productId: number;
+    items: Array<{
+      productId: number;
+      quantity: number;
+      unitPrice: number;
+    }>;
     customerId: number;
     deliveryId: number;
   }): Promise<Transaction>;

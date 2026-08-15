@@ -11,6 +11,7 @@ import { fetchProducts } from '../../features/products/productsSlice';
 
 import { ProductPageView } from './ProductPageView';
 import type { TransactionResponse } from '../../features/checkout/checkoutService';
+import type { CartItem } from './ProductPage.types';
 
 import './ProductPage.css';
 
@@ -21,23 +22,48 @@ export const ProductPage: FC = () => {
     (state: RootState) => state.products,
   );
 
-const [selectedProduct, setSelectedProduct] =
-  useState<Product | null>(null);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
 const [transactionResult, setTransactionResult] =
   useState<TransactionResponse | null>(null);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  const handleSelectProduct = (product: Product) => {
+  const handleAddToCart = (product: Product) => {
     setTransactionResult(null);
-    setSelectedProduct(product);
+    setCartItems((previous) => {
+      const item = previous.find(({ product: cartProduct }) => cartProduct.id === product.id);
+
+      if (!item) {
+        return [...previous, { product, quantity: 1 }];
+      }
+
+      return previous.map((cartItem) =>
+        cartItem.product.id === product.id
+          ? {
+              ...cartItem,
+              quantity: Math.min(cartItem.quantity + 1, product.stock),
+            }
+          : cartItem,
+      );
+    });
+  };
+
+  const handleCheckoutCart = () => {
+    setIsCheckoutOpen(true);
+  };
+
+  const handleRemoveFromCart = (productId: number) => {
+    setCartItems((previous) =>
+      previous.filter((item) => item.product.id !== productId),
+    );
   };
 
   const handleCloseCheckout = async () => {
-    setSelectedProduct(null);
+    setIsCheckoutOpen(false);
 
     await dispatch(fetchProducts());
   };
@@ -74,7 +100,7 @@ const [transactionResult, setTransactionResult] =
 
   const transaction =
     await checkoutService.createTransaction({
-      productId: data.productId,
+      items: data.items,
       customerId: customer.id,
       deliveryId: delivery.id,
       customerEmail: data.customerEmail,
@@ -89,20 +115,26 @@ const [transactionResult, setTransactionResult] =
 
   setTransactionResult(transaction);
 
+  if (transaction.statusId === 2) {
+    setCartItems([]);
+  }
+
   console.log('Transaction:', transaction);
 };
 
   return (
     <ProductPageView
       error={error}
-      isCheckoutOpen={selectedProduct !== null}
+      cartItems={cartItems}
+      isCheckoutOpen={isCheckoutOpen}
       loading={loading}
       onCloseCheckout={handleCloseCheckout}
       onCloseTransactionResult={handleCloseTransactionResult}
-      onSelectProduct={handleSelectProduct}
+      onAddToCart={handleAddToCart}
+      onCheckoutCart={handleCheckoutCart}
+      onRemoveFromCart={handleRemoveFromCart}
       onSubmitCheckout={handleCheckout}
       products={products}
-      selectedProduct={selectedProduct}
       transactionResult={transactionResult}
     />
   );

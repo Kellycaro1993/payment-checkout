@@ -1,15 +1,31 @@
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsEmail,
   IsInt,
   IsNotEmpty,
   IsString,
   Min,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateTransactionDto {
+export class CreateTransactionItemDto {
   @IsInt()
   @Min(1)
   public productId!: number;
+
+  @IsInt()
+  @Min(1)
+  public quantity!: number;
+}
+
+export class CreateTransactionDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTransactionItemDto)
+  public items!: CreateTransactionItemDto[];
 
   @IsInt()
   @Min(1)

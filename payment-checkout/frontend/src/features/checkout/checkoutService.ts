@@ -29,7 +29,10 @@ export interface DeliveryResponse {
   customerId: number;
 }
 export interface CreateTransactionPayload {
-  productId: number;
+  items: Array<{
+    productId: number;
+    quantity: number;
+  }>;
   customerId: number;
   deliveryId: number;
   customerEmail: string;
@@ -48,7 +51,6 @@ export interface TransactionResponse {
   totalAmount: number;
   paymentId: string | null;
   statusId: number;
-  productId: number;
   customerId: number;
   deliveryId: number;
 }

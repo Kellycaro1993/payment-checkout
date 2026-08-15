@@ -33,7 +33,7 @@ export class TransactionsController {
     @Body() dto: CreateTransactionDto,
   ) {
     return this.transactionsService.createTransaction(
-      dto.productId,
+      dto.items,
       dto.customerId,
       dto.deliveryId,
       {

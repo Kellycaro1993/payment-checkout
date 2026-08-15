@@ -4,6 +4,7 @@ import { TransactionsRepository } from '../repositories/transactions.repository'
 import {PaymentGateway,PaymentRequest} from '../../../infrastructure/integrations/payment/payment.gateway';
 import { CustomersRepository } from '../../customers/repositories/customers.repository';
 import { DeliveriesRepository } from '../../deliveries/repositories/deliveries.repository';
+import type { CreateTransactionItemDto } from '../dto/create-transaction.dto';
 
 const TRANSACTION_STATUS = {
   PENDING: 1,
@@ -27,19 +28,32 @@ export class TransactionsService {
 
 
   public async createTransaction(
-    productId: number,
+    items: CreateTransactionItemDto[],
     customerId: number,
     deliveryId: number,
     payment: Omit<PaymentRequest, 'amount'>,
   ) {
-    const product = await this.productsRepository.findById(productId);
+    const productIds = items.map((item) => item.productId);
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
+    if (new Set(productIds).size !== productIds.length) {
+      throw new BadRequestException('A product can only appear once in the cart');
     }
 
-    if (product.stock <= 0) {
-      throw new Error('Product is out of stock');
+    const products = await Promise.all(
+      items.map(async (item) => ({
+        item,
+        product: await this.productsRepository.findById(item.productId),
+      })),
+    );
+
+    for (const { item, product } of products) {
+      if (!product) {
+        throw new NotFoundException(`Product ${item.productId} not found`);
+      }
+
+      if (product.stock < item.quantity) {
+        throw new BadRequestException(`Product ${item.productId} does not have enough stock`);
+      }
     }
 
     const customer = await this.customersRepository.findById(customerId);
@@ -59,7 +73,10 @@ export class TransactionsService {
       );
     }
 
-    const productAmount = product.price;
+    const productAmount = products.reduce(
+      (total, { item, product }) => total + product!.price * item.quantity,
+      0,
+    );
     const totalAmount = productAmount + BASE_FEE + DELIVERY_FEE;
 
     const transaction = await this.transactionsRepository.create({
@@ -68,9 +85,13 @@ export class TransactionsService {
       deliveryFee: DELIVERY_FEE,
       totalAmount,
       statusId: TRANSACTION_STATUS.PENDING,
-      productId,
       customerId,
       deliveryId,
+      items: products.map(({ item, product }) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: product!.price,
+      })),
     });
 
     const paymentResult = await this.paymentGateway.processPayment({
@@ -92,7 +113,11 @@ export class TransactionsService {
       };
     }
 
-    await this.productsRepository.updateStock(productId, 1);
+    await Promise.all(
+      items.map((item) =>
+        this.productsRepository.updateStock(item.productId, item.quantity),
+      ),
+    );
 
     const updatedTransaction =
       await this.transactionsRepository.updateStatus(
