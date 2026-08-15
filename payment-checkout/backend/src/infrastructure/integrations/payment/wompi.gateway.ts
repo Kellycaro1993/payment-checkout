@@ -70,6 +70,25 @@ export class WompiGateway implements PaymentGateway {
     }
   }
 
+  private async getAcceptanceTokens(): Promise<{acceptanceToken: string;acceptPersonalAuth: string;}> {
+    const publicKey = process.env.WOMPI_PUBLIC_KEY;
+
+    if (!publicKey) {
+        throw new Error('WOMPI_PUBLIC_KEY is not configured');
+    }
+
+    const url = `${process.env.WOMPI_API_URL}/merchants/${publicKey}`;
+
+    const response = await this.httpService.axiosRef.get(url);
+
+    return {
+        acceptanceToken:
+        response.data.data.presigned_acceptance.acceptance_token,
+        acceptPersonalAuth:
+        response.data.data.presigned_personal_data_auth.acceptance_token,
+    };
+    }
+
   private generateIntegritySignature(
     reference: string,
     amountInCents: number,

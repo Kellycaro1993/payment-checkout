@@ -21,7 +21,7 @@ describe('WompiGateway', () => {
   });
 
   describe('processPayment', () => {
-    it('should generate the integrity signature correctly', async () => {
+ it('should generate the integrity signature correctly', async () => {
   httpService.axiosRef.post.mockResolvedValue({
     data: {
       data: {
@@ -42,7 +42,7 @@ describe('WompiGateway', () => {
   });
 
   const expectedSignature =
-    'aquí vamos a colocar el SHA-256 esperado';
+    '8296d12f247a42c18c555509fd10832b414c965710e3d17039ddabbb945da3cb';
 
   const call = httpService.axiosRef.post.mock.calls[0];
 
