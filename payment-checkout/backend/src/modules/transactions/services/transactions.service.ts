@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ProductsRepository } from '../../products/repositories/products.repository';
 import { TransactionsRepository } from '../repositories/transactions.repository';
 import {PaymentGateway,PaymentRequest} from '../../../infrastructure/integrations/payment/payment.gateway';
 import { CustomersRepository } from '../../customers/repositories/customers.repository';
+import { DeliveriesRepository } from '../../deliveries/repositories/deliveries.repository';
+
 const TRANSACTION_STATUS = {
   PENDING: 1,
   APPROVED: 2,
@@ -20,6 +22,7 @@ export class TransactionsService {
     private readonly productsRepository: ProductsRepository,
     private readonly paymentGateway: PaymentGateway,
     private readonly customersRepository: CustomersRepository,
+    private readonly deliveriesRepository: DeliveriesRepository,
   ) {}
 
 
@@ -43,6 +46,17 @@ export class TransactionsService {
 
     if (!customer) {
       throw new NotFoundException('Customer not found');
+    }
+    const delivery = await this.deliveriesRepository.findById(deliveryId);
+
+    if (!delivery) {
+      throw new NotFoundException('Delivery not found');
+    }
+
+    if (delivery.customerId !== customerId) {
+      throw new BadRequestException(
+        'Delivery does not belong to customer',
+      );
     }
 
     const productAmount = product.price;

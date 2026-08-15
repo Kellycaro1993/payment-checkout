@@ -1,14 +1,16 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { TransactionsRepository } from '../repositories/transactions.repository';
 import { ProductsRepository } from '../../products/repositories/products.repository';
 import { PaymentGateway } from '../../../infrastructure/integrations/payment/payment.gateway';
 import { CustomersRepository } from '../../customers/repositories/customers.repository';
+import { DeliveriesRepository } from '../../deliveries/repositories/deliveries.repository';
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
   let customersRepository: jest.Mocked<CustomersRepository>;
+  let deliveriesRepository: jest.Mocked<DeliveriesRepository>;
 
   let transactionsRepository: jest.Mocked<TransactionsRepository>;
   let productsRepository: jest.Mocked<ProductsRepository>;
@@ -21,10 +23,15 @@ describe('TransactionsService', () => {
       updateStatus: jest.fn(),
     };
 
+    deliveriesRepository = {
+      findById: jest.fn(),
+      create: jest.fn(),
+    };
+
     customersRepository = {
-        findById: jest.fn(),
-        create: jest.fn(),
-        };
+      findById: jest.fn(),
+      create: jest.fn(),
+    };
 
     productsRepository = {
       findAll: jest.fn(),
@@ -40,11 +47,60 @@ describe('TransactionsService', () => {
       transactionsRepository,
       productsRepository,
       paymentGateway,
-      customersRepository
+      customersRepository,
+      deliveriesRepository
     );
   });
 
   describe('createTransaction', () => {
+
+    it('should throw BadRequestException when delivery does not belong to customer', async () => {
+        const product = {
+            id: 1,
+            name: 'Wireless Headphones',
+            description: 'Bluetooth wireless headphones',
+            price: 189900,
+            stock: 15,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+
+        productsRepository.findById.mockResolvedValue(product);
+
+        customersRepository.findById.mockResolvedValue({
+            id: 1,
+            name: 'Test User',
+            email: 'test@example.com',
+            phone: '3001234567',
+        });
+
+        deliveriesRepository.findById.mockResolvedValue({
+            id: 1,
+            address: 'Calle 123 #45-67',
+            city: 'Bogotá',
+            customerId: 2,
+            createdAt: new Date(),
+        });
+
+        await expect(
+            service.createTransaction(
+            1,
+            1,
+            1,
+            {
+                customerEmail: 'test@example.com',
+                cardToken: 'card-token-test',
+                installments: 1,
+                reference: 'TEST-TRANSACTION-001',
+                acceptanceToken: 'acceptance-token-test',
+                acceptPersonalAuth: 'personal-auth-test',
+            },
+            ),
+        ).rejects.toThrow(BadRequestException);
+
+        expect(transactionsRepository.create).not.toHaveBeenCalled();
+        expect(paymentGateway.processPayment).not.toHaveBeenCalled();
+    });
     it('should approve the transaction and update stock when payment succeeds', async () => {
       const product = {
         id: 1,
@@ -78,6 +134,20 @@ describe('TransactionsService', () => {
       };
 
       productsRepository.findById.mockResolvedValue(product);
+      customersRepository.findById.mockResolvedValue({
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        phone: '3001234567',
+        });
+
+      deliveriesRepository.findById.mockResolvedValue({
+        id: 1,
+        address: 'Calle 123 #45-67',
+        city: 'Bogotá',
+        customerId: 1,
+        createdAt: new Date(),
+      });
 
       transactionsRepository.create.mockResolvedValue(transaction);
 
@@ -106,7 +176,6 @@ describe('TransactionsService', () => {
           reference: 'TEST-TRANSACTION-001',
           acceptanceToken: 'acceptance-token-test',
           acceptPersonalAuth: 'personal-auth-test',
-         
         },
       );
 
@@ -131,7 +200,6 @@ describe('TransactionsService', () => {
         reference: 'TEST-TRANSACTION-001',
         acceptanceToken: 'acceptance-token-test',
         acceptPersonalAuth: 'personal-auth-test',
-       
       });
 
       expect(productsRepository.updateStock).toHaveBeenCalledWith(1, 1);
@@ -177,6 +245,21 @@ describe('TransactionsService', () => {
 
       productsRepository.findById.mockResolvedValue(product);
 
+      customersRepository.findById.mockResolvedValue({
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        phone: '3001234567',
+        });
+            
+      deliveriesRepository.findById.mockResolvedValue({
+        id: 1,
+        address: 'Calle 123 #45-67',
+        city: 'Bogotá',
+        customerId: 1,
+        createdAt: new Date(),
+      });
+
       transactionsRepository.create.mockResolvedValue(transaction);
 
       paymentGateway.processPayment.mockResolvedValue({
@@ -200,7 +283,6 @@ describe('TransactionsService', () => {
           reference: 'TEST-TRANSACTION-001',
           acceptanceToken: 'acceptance-token-test',
           acceptPersonalAuth: 'personal-auth-test',
-         
         },
       );
 
@@ -230,7 +312,6 @@ describe('TransactionsService', () => {
             reference: 'TEST-TRANSACTION-001',
             acceptanceToken: 'acceptance-token-test',
             acceptPersonalAuth: 'personal-auth-test',
-           
           },
         ),
       ).rejects.toThrow(NotFoundException);

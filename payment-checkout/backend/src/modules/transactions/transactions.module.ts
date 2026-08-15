@@ -7,12 +7,14 @@ import { TransactionsService } from './services/transactions.service';
 import { ProductsModule } from '../products/products.module';
 import { TransactionsController } from './controllers/transactions.controller';
 import { CustomersModule } from '../customers/customers.module';
+import { DeliveriesModule } from '../deliveries/deliveries.module';
 @Module({
     imports: [
         PaymentModule,
         PrismaModule,
         ProductsModule,
-        CustomersModule
+        CustomersModule,
+        DeliveriesModule,
     ],
     providers: [
         {
@@ -21,7 +23,7 @@ import { CustomersModule } from '../customers/customers.module';
         },
         TransactionsService,
     ],
-    exports: [TransactionsRepository, TransactionsService],
+    exports: [TransactionsRepository, TransactionsService], 
     controllers: [TransactionsController],
 })
 export class TransactionsModule {}
