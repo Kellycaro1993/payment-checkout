@@ -20,7 +20,7 @@ Aplicación full stack para comprar productos, agruparlos en un carrito y proces
 ## Tecnologías
 
 - Frontend: React, TypeScript, Vite, Redux Toolkit y Jest.
-- Backend: NestJS, Prisma, SQLite y Jest.
+- Backend: NestJS, Prisma, PostgreSQL y Jest.
 - Pagos: Wompi Sandbox.
 
 ## Arquitectura
@@ -37,7 +37,7 @@ backend/                          NestJS + Prisma
 ├── src/modules/deliveries        Registro de entregas
 ├── src/modules/transactions      Cálculo y creación de pagos
 ├── src/infrastructure            Integración con Wompi
-└── prisma                        Esquema, migraciones y base SQLite
+└── prisma                        Esquema, migraciones y base PostgreSQL
 ```
 
 El frontend solicita el token de tarjeta y los tokens de aceptación a Wompi. El backend valida los datos, calcula el total, crea la transacción y actualiza el inventario solo si Wompi la aprueba.
@@ -65,6 +65,7 @@ Transaction 1 ─── N TransactionItem N ─── 1 Product
 
 - Node.js 20 o superior.
 - npm.
+- PostgreSQL 18, local o administrado.
 
 ## Configuración
 
@@ -81,7 +82,7 @@ npm exec prisma migrate deploy
 Crea `backend/.env` con tus propias credenciales:
 
 ```env
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://USUARIO:CONTRASENA@localhost:5432/payment_checkout?schema=public"
 WOMPI_API_URL="https://api-sandbox.co.uat.wompi.dev/v1"
 WOMPI_PUBLIC_KEY="pub_test_..."
 WOMPI_PRIVATE_KEY="prv_test_..."
@@ -89,6 +90,8 @@ WOMPI_EVENTS_SECRET="..."
 WOMPI_INTEGRITY_SECRET="..."
 PORT=3000
 ```
+
+Reemplaza `USUARIO`, `CONTRASENA`, host, puerto y nombre de base de datos por los datos de tu instancia de PostgreSQL. No uses credenciales reales en el README ni las subas al repositorio.
 
 Inicia el servidor:
 
