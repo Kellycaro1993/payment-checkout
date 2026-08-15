@@ -15,6 +15,14 @@ export class PrismaCustomersRepository implements CustomersRepository {
     });
   }
 
+  public async findByEmail(email: string) {
+    return this.prisma.customer.findUnique({
+      where: {
+        email,
+      },
+    });
+  }
+
   public async create(data: {
     name: string;
     email: string;

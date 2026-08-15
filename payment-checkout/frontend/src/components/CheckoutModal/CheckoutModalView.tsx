@@ -1,10 +1,24 @@
 import type { FC } from 'react';
 import type { CheckoutModalViewProps } from './CheckoutModal.types';
 
+const FieldError: FC<{ error?: string; id: string }> = ({ error, id }) => {
+  if (!error) {
+    return null;
+  }
+
+  return (
+    <p className="CheckoutModal__field-error" id={id} role="alert">
+      {error}
+    </p>
+  );
+};
+
 export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
   isOpen,
   formData,
+  fieldErrors,
   loading,
+  paymentError,
   step,
   productAmount,
   baseFee,
@@ -50,6 +64,7 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
         {step === 'form' && (
           <form
             className="CheckoutModal__body"
+            noValidate
             onSubmit={onSubmit}
           >
             <div className="CheckoutModal__section">
@@ -78,15 +93,17 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 className="CheckoutModal__input"
                 id="customerName"
                 autoComplete="name"
-                minLength={2}
                 name="customerName"
                 onChange={onChange}
                 placeholder="Nombre completo"
                 required
-                title="Ingresa al menos 2 caracteres."
+                title="El nombre es obligatorio."
                 type="text"
                 value={formData.customerName}
+                aria-describedby={fieldErrors.customerName ? 'customerName-error' : undefined}
+                aria-invalid={Boolean(fieldErrors.customerName)}
               />
+              <FieldError error={fieldErrors.customerName} id="customerName-error" />
             </div>
 
             <div className="CheckoutModal__section">
@@ -108,7 +125,10 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 title="Ingresa un correo electrónico válido."
                 type="email"
                 value={formData.customerEmail}
+                aria-describedby={fieldErrors.customerEmail ? 'customerEmail-error' : undefined}
+                aria-invalid={Boolean(fieldErrors.customerEmail)}
               />
+              <FieldError error={fieldErrors.customerEmail} id="customerEmail-error" />
             </div>
 
             <div className="CheckoutModal__section">
@@ -124,16 +144,17 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 id="customerPhone"
                 autoComplete="tel"
                 inputMode="numeric"
-                maxLength={10}
                 name="customerPhone"
                 onChange={onChange}
-                pattern="[0-9]{10}"
                 placeholder="3001234567"
                 required
-                title="Ingresa un número de teléfono de 10 dígitos."
+                title="El teléfono es obligatorio."
                 type="tel"
                 value={formData.customerPhone}
+                aria-describedby={fieldErrors.customerPhone ? 'customerPhone-error' : undefined}
+                aria-invalid={Boolean(fieldErrors.customerPhone)}
               />
+              <FieldError error={fieldErrors.customerPhone} id="customerPhone-error" />
             </div>
 
             <h3 className="CheckoutModal__subtitle">
@@ -152,15 +173,17 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 className="CheckoutModal__input"
                 id="address"
                 autoComplete="street-address"
-                minLength={5}
                 name="address"
                 onChange={onChange}
                 placeholder="Calle 123 #45-67"
                 required
-                title="Ingresa una dirección de al menos 5 caracteres."
+                title="La dirección es obligatoria."
                 type="text"
                 value={formData.address}
+                aria-describedby={fieldErrors.address ? 'address-error' : undefined}
+                aria-invalid={Boolean(fieldErrors.address)}
               />
+              <FieldError error={fieldErrors.address} id="address-error" />
             </div>
 
             <div className="CheckoutModal__section">
@@ -175,15 +198,17 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 className="CheckoutModal__input"
                 id="city"
                 autoComplete="address-level2"
-                minLength={2}
                 name="city"
                 onChange={onChange}
                 placeholder="Bogotá"
                 required
-                title="Ingresa una ciudad de al menos 2 caracteres."
+                title="La ciudad es obligatoria."
                 type="text"
                 value={formData.city}
+                aria-describedby={fieldErrors.city ? 'city-error' : undefined}
+                aria-invalid={Boolean(fieldErrors.city)}
               />
+              <FieldError error={fieldErrors.city} id="city-error" />
             </div>
 
             <h3 className="CheckoutModal__subtitle">
@@ -203,16 +228,20 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 id="cardNumber"
                 autoComplete="cc-number"
                 inputMode="numeric"
-                maxLength={16}
+                maxLength={19}
                 name="cardNumber"
                 onChange={onChange}
-                pattern="[0-9]{16}"
-                placeholder="4111111111111111"
+                pattern="[0-9]{4}( [0-9]{4}){3}"
+                placeholder="4111 1111 1111 1111"
                 required
                 title="Ingresa los 16 dígitos de la tarjeta."
                 type="text"
                 value={formData.cardNumber}
+                aria-describedby={paymentError || fieldErrors.cardNumber ? 'cardNumber-error' : undefined}
+                aria-invalid={Boolean(paymentError || fieldErrors.cardNumber)}
               />
+
+              <FieldError error={paymentError || fieldErrors.cardNumber} id="cardNumber-error" />
             </div>
 
             <div className="CheckoutModal__section">
@@ -235,7 +264,10 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 title="Ingresa el nombre del titular como aparece en la tarjeta."
                 type="text"
                 value={formData.cardHolder}
+                aria-describedby={fieldErrors.cardHolder ? 'cardHolder-error' : undefined}
+                aria-invalid={Boolean(fieldErrors.cardHolder)}
               />
+              <FieldError error={fieldErrors.cardHolder} id="cardHolder-error" />
             </div>
 
             <div className="CheckoutModal__fields">
@@ -257,10 +289,13 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 pattern="(0[1-9]|1[0-2])/[0-9]{2}"
                 placeholder="MM/YY"
                 required
-                title="Usa el formato MM/AA, por ejemplo 08/28."
+                  title="Usa el formato MM/AA, por ejemplo 08/28."
                   type="text"
                   value={formData.cardExpiration}
+                  aria-describedby={fieldErrors.cardExpiration ? 'cardExpiration-error' : undefined}
+                  aria-invalid={Boolean(fieldErrors.cardExpiration)}
                 />
+                <FieldError error={fieldErrors.cardExpiration} id="cardExpiration-error" />
               </div>
 
               <div className="CheckoutModal__section">
@@ -282,10 +317,13 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
                 pattern="[0-9]{3}"
                 placeholder="123"
                 required
-                title="Ingresa los 3 dígitos del CVV."
+                  title="Ingresa los 3 dígitos del CVV."
                   type="text"
                   value={formData.cardCvv}
+                  aria-describedby={fieldErrors.cardCvv ? 'cardCvv-error' : undefined}
+                  aria-invalid={Boolean(fieldErrors.cardCvv)}
                 />
+                <FieldError error={fieldErrors.cardCvv} id="cardCvv-error" />
               </div>
             </div>
 
@@ -304,13 +342,16 @@ export const CheckoutModalView: FC<CheckoutModalViewProps> = ({
               onChange={onChange}
               required
                 value={formData.installments}
+                aria-describedby={fieldErrors.installments ? 'installments-error' : undefined}
+                aria-invalid={Boolean(fieldErrors.installments)}
               >
                 <option value={1}>1 cuota</option>
                 <option value={2}>2 cuotas</option>
                 <option value={3}>3 cuotas</option>
                 <option value={6}>6 cuotas</option>
-                <option value={12}>12 cuotas</option>
-              </select>
+              <option value={12}>12 cuotas</option>
+            </select>
+            <FieldError error={fieldErrors.installments} id="installments-error" />
             </div>
 
             <div className="CheckoutModal__footer">

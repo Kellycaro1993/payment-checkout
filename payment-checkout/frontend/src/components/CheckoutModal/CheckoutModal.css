@@ -170,3 +170,14 @@
     width: 100%;
   }
 }
+
+.CheckoutModal__input[aria-invalid='true'] {
+  border-color: #c0392b;
+}
+
+.CheckoutModal__field-error {
+  margin: 6px 0 0;
+  color: #c0392b;
+  font-size: 13px;
+  line-height: 1.4;
+}

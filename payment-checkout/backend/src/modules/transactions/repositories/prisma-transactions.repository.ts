@@ -9,6 +9,14 @@ export class PrismaTransactionsRepository implements TransactionsRepository {
     private readonly prisma: PrismaService,
   ) {}
 
+  public async findAll(): Promise<Transaction[]> {
+    return this.prisma.transaction.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   public async create(data: {
     productAmount: number;
     baseFee: number;

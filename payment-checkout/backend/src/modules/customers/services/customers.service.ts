@@ -11,11 +11,18 @@ export class CustomersService {
     name: string,
     email: string,
     phone: string,
-  ) {
+    ) {
+    const existingCustomer =
+        await this.customersRepository.findByEmail(email);
+
+    if (existingCustomer) {
+        return existingCustomer;
+    }
+
     return this.customersRepository.create({
-      name,
-      email,
-      phone,
+        name,
+        email,
+        phone,
     });
-  }
+    }
 }

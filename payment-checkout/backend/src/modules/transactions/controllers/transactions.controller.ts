@@ -1,12 +1,32 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
+
+import { CreateTransactionDto } from '../dto/create-transaction.dto';
 import { TransactionsService } from '../services/transactions.service';
-import {CreateTransactionDto } from '../dto/create-transaction.dto';
 
 @Controller('transactions')
 export class TransactionsController {
   public constructor(
     private readonly transactionsService: TransactionsService,
   ) {}
+
+  @Get()
+  public async findAll() {
+    return this.transactionsService.getTransactions();
+  }
+
+  @Get(':id')
+  public async findById(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.transactionsService.getTransactionById(id);
+  }
 
   @Post()
   public async create(

@@ -103,4 +103,20 @@ export class TransactionsService {
 
     return updatedTransaction;
   }
+
+  public async getTransactions() {
+    return this.transactionsRepository.findAll();
+  }
+
+  public async getTransactionById(id: number) {
+    const transaction =
+      await this.transactionsRepository.findById(id);
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    return transaction;
+  }
+
 }

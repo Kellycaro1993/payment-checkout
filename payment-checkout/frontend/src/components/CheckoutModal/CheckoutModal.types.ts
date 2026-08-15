@@ -21,6 +21,10 @@ export interface CheckoutItem extends CheckoutFormData {
   amount: number;
 }
 
+export type CheckoutFieldErrors = Partial<
+  Record<keyof CheckoutFormData, string>
+>;
+
 export interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -32,7 +36,9 @@ export interface CheckoutModalProps {
 export interface CheckoutModalViewProps {
   isOpen: boolean;
   formData: CheckoutFormData;
+  fieldErrors: CheckoutFieldErrors;
   loading: boolean;
+  paymentError: string | null;
   totalAmount: number;
   onClose: () => void;
   step: CheckoutStep;

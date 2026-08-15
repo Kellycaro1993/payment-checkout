@@ -12,6 +12,8 @@ export abstract class TransactionsRepository {
     deliveryId: number;
   }): Promise<Transaction>;
 
+  public abstract findAll(): Promise<Transaction[]>;
+
   public abstract findById(id: number): Promise<Transaction | null>;
 
   public abstract updateStatus(
