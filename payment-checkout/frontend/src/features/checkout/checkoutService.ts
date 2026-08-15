@@ -1,30 +1,89 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-interface CreateTransactionRequest {
+export interface CreateCustomerPayload {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface CustomerResponse {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface CreateDeliveryPayload {
+  address: string;
+  city: string;
+  customerId: number;
+}
+
+export interface DeliveryResponse {
+  id: number;
+  address: string;
+  city: string;
+  customerId: number;
+}
+export interface CreateTransactionPayload {
   productId: number;
   customerId: number;
   deliveryId: number;
-  amount: number;
-  cardNumber: string;
-  cardHolder: string;
-  cardExpiration: string;
-  cardCvv: string;
+  customerEmail: string;
+  cardToken: string;
+  installments: number;
+  reference: string;
+  acceptanceToken: string;
+  acceptPersonalAuth: string;
+}
+
+export interface TransactionResponse {
+  id: number;
+  productAmount: number;
+  baseFee: number;
+  deliveryFee: number;
+  totalAmount: number;
+  paymentId: string | null;
+  statusId: number;
+  productId: number;
+  customerId: number;
+  deliveryId: number;
 }
 
 export const checkoutService = {
-  createTransaction: async (data: CreateTransactionRequest) => {
-    try {
-      const response = await axios.post(`${API_URL}/transactions`, data);
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(
-          error.response?.data?.message || 'Error al procesar el pago'
-        );
-      }
-      throw error;
-    }
+  createCustomer: async (
+    data: CreateCustomerPayload,
+  ): Promise<CustomerResponse> => {
+    const response = await axios.post<CustomerResponse>(
+      `${API_URL}/customers`,
+      data,
+    );
+
+    return response.data;
+  },
+
+  createDelivery: async (
+    data: CreateDeliveryPayload,
+  ): Promise<DeliveryResponse> => {
+    const response = await axios.post<DeliveryResponse>(
+      `${API_URL}/deliveries`,
+      data,
+    );
+
+    return response.data;
+  },
+
+  createTransaction: async (
+    data: CreateTransactionPayload,
+  ): Promise<TransactionResponse> => {
+    const response = await axios.post<TransactionResponse>(
+      `${API_URL}/transactions`,
+      data,
+    );
+
+    return response.data;
   },
 };
