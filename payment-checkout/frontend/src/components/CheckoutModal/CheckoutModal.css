@@ -150,6 +150,13 @@
     padding: 20px;
   }
 
+  .CheckoutModal__subtitle {
+    margin: 8px 0 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+  }
+
   .CheckoutModal__fields {
     flex-direction: column;
     gap: 0;

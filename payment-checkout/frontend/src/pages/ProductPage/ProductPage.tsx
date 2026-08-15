@@ -13,7 +13,6 @@ export const ProductPage: FC = () => {
     (state: RootState) => state.products,
   );
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -21,11 +20,10 @@ export const ProductPage: FC = () => {
 
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
-    setIsCheckoutOpen(true);
   };
 
   const handleCloseCheckout = () => {
-    setIsCheckoutOpen(false);
+    setSelectedProduct(null);
   };
 
   const handleCheckout = async (data: CheckoutItem) => {
@@ -36,7 +34,7 @@ export const ProductPage: FC = () => {
   return (
     <ProductPageView
       error={error}
-      isCheckoutOpen={isCheckoutOpen}
+      isCheckoutOpen={selectedProduct !== null}
       loading={loading}
       onCloseCheckout={handleCloseCheckout}
       onSelectProduct={handleSelectProduct}

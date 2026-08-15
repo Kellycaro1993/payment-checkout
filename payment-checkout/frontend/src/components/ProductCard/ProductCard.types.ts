@@ -1,4 +1,6 @@
-import type { Product } from '../../features/products/productsSlice';
+import type { Product as ProductItem } from '../../features/products/productsSlice';
+
+export type Product = ProductItem;
 
 export interface ProductCardProps {
   product: Product;

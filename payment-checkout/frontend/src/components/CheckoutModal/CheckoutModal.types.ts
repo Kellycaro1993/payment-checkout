@@ -1,10 +1,14 @@
 import type { ChangeEvent, FormEvent } from 'react';
 
-export interface CheckoutItem {
-  productId: number;
-  customerId: number;
-  deliveryId: number;
-  amount: number;
+export type CheckoutStep = 'form' | 'summary';
+export interface CheckoutFormData {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+
+  address: string;
+  city: string;
+
   cardNumber: string;
   cardHolder: string;
   cardExpiration: string;
@@ -12,14 +16,9 @@ export interface CheckoutItem {
   installments: number;
 }
 
-export interface CheckoutFormData {
-  customerId: number;
-  deliveryId: number;
-  cardNumber: string;
-  cardHolder: string;
-  cardExpiration: string;
-  cardCvv: string;
-  installments: number;
+export interface CheckoutItem extends CheckoutFormData {
+  productId: number;
+  amount: number;
 }
 
 export interface CheckoutModalProps {
@@ -36,6 +35,12 @@ export interface CheckoutModalViewProps {
   loading: boolean;
   totalAmount: number;
   onClose: () => void;
+  step: CheckoutStep;
+  productAmount: number;
+  baseFee: number;
+  deliveryFee: number;
+  onBack: () => void;
+  onConfirm: () => Promise<void>;
 
   onChange: (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
