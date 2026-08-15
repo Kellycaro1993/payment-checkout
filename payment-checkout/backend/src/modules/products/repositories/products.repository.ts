@@ -1,10 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Product } from '../../../../generated/prisma/client';
 
-@Injectable()
 export abstract class ProductsRepository {
-  abstract findAll();
-  abstract findById(id: string);
-  abstract create(data: any);
-  abstract update(id: string, data: any);
-  abstract delete(id: string);
+  abstract findAll(): Promise<Product[]>;
+  abstract findById(id: number): Promise<Product | null>;
+  abstract updateStock(id: number, quantity: number): Promise<Product>;
 }
