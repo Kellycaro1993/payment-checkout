@@ -6,10 +6,16 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
+import { ApiBody, ApiExtraModels, ApiTags } from '@nestjs/swagger';
 
-import { CreateTransactionDto } from '../dto/create-transaction.dto';
+import {
+  CreateTransactionDto,
+  CreateTransactionItemDto,
+} from '../dto/create-transaction.dto';
 import { TransactionsService } from '../services/transactions.service';
 
+@ApiTags('transactions')
+@ApiExtraModels(CreateTransactionDto, CreateTransactionItemDto)
 @Controller('transactions')
 export class TransactionsController {
   public constructor(
@@ -29,6 +35,7 @@ export class TransactionsController {
   }
 
   @Post()
+  @ApiBody({ type: CreateTransactionDto })
   public async create(
     @Body() dto: CreateTransactionDto,
   ) {

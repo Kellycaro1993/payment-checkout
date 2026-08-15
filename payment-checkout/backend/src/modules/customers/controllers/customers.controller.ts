@@ -3,10 +3,12 @@ import {
   Controller,
   Post,
 } from '@nestjs/common';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 import { CreateCustomerDto } from '../dto/create-customer.dto';
 import { CustomersService } from '../services/customers.service';
 
+@ApiTags('customers')
 @Controller('customers')
 export class CustomersController {
   public constructor(
@@ -14,6 +16,7 @@ export class CustomersController {
   ) {}
 
   @Post()
+  @ApiBody({ type: CreateCustomerDto })
   public async create(
     @Body() dto: CreateCustomerDto,
   ) {
