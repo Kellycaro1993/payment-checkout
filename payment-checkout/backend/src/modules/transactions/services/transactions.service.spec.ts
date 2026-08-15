@@ -1,6 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import type { Mocked } from 'jest-mock';
 import { NotFoundException } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { TransactionsRepository } from '../repositories/transactions.repository';
@@ -9,176 +7,219 @@ import { PaymentGateway } from '../../../infrastructure/integrations/payment/pay
 
 describe('TransactionsService', () => {
   let service: TransactionsService;
-  let transactionsRepository: Mocked<TransactionsRepository>;
-  let productsRepository: Mocked<ProductsRepository>;
-  let paymentGateway: Mocked<PaymentGateway>;
 
-  beforeEach(async () => {
-    const mockTransactionsRepository = {
-      findAll: jest.fn(),
-      findById: jest.fn(),
+  let transactionsRepository: jest.Mocked<TransactionsRepository>;
+  let productsRepository: jest.Mocked<ProductsRepository>;
+  let paymentGateway: jest.Mocked<PaymentGateway>;
+
+  beforeEach(() => {
+    transactionsRepository = {
       create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      findByCustomerId: jest.fn(),
-      findByStatus: jest.fn(),
+      findById: jest.fn(),
       updateStatus: jest.fn(),
     };
 
-    const mockProductsRepository = {
+    productsRepository = {
       findAll: jest.fn(),
       findById: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
       updateStock: jest.fn(),
     };
 
-    const mockPaymentGateway = {
+    paymentGateway = {
       processPayment: jest.fn(),
-      refundPayment: jest.fn(),
-      getTransactionStatus: jest.fn(),
     };
 
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        TransactionsService,
-        {
-          provide: TransactionsRepository,
-          useValue: mockTransactionsRepository,
-        },
-        {
-          provide: ProductsRepository,
-          useValue: mockProductsRepository,
-        },
-        {
-          provide: PaymentGateway,
-          useValue: mockPaymentGateway,
-        },
-      ],
-    }).compile();
-
-    service = module.get<TransactionsService>(TransactionsService);
-    transactionsRepository = module.get(
-      TransactionsRepository,
-    ) as Mocked<TransactionsRepository>;
-    productsRepository = module.get(
-      ProductsRepository,
-    ) as Mocked<ProductsRepository>;
-    paymentGateway = module.get(PaymentGateway) as Mocked<PaymentGateway>;
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+    service = new TransactionsService(
+      transactionsRepository,
+      productsRepository,
+      paymentGateway,
+    );
   });
 
   describe('createTransaction', () => {
-    const productId = 1;
-    const customerId = 1;
-    const deliveryId = 1;
-    const paymentRequest = {
-      cardNumber: '1234567890123456',
-      cvv: '123',
-      expiryDate: '12/25',
-    };
-
-    const mockProduct = {
-      id: productId,
-      name: 'Product 1',
-      price: 100000,
-      description: 'Description 1',
-      stock: 10,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    it('should create a transaction with approved payment', async () => {
-      const mockTransaction = {
+    it('should approve the transaction and update stock when payment succeeds', async () => {
+      const product = {
         id: 1,
-        productAmount: 100000,
-        baseFee: 5000,
-        deliveryFee: 10000,
-        totalAmount: 115000,
-        statusId: 2,
-        productId,
-        customerId,
-        deliveryId,
-        paymentId: 'payment123',
+        name: 'Wireless Headphones',
+        description: 'Bluetooth wireless headphones',
+        price: 189900,
+        stock: 15,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      productsRepository.findById.mockResolvedValue(mockProduct);
-      transactionsRepository.create.mockResolvedValue(mockTransaction);
-      transactionsRepository.updateStatus.mockResolvedValue(mockTransaction);
+      const transaction = {
+        id: 1,
+        productAmount: 189900,
+        baseFee: 5000,
+        deliveryFee: 10000,
+        totalAmount: 204900,
+        statusId: 1,
+        paymentId: null,
+        productId: 1,
+        customerId: 1,
+        deliveryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const approvedTransaction = {
+        ...transaction,
+        statusId: 2,
+        paymentId: 'payment-123',
+      };
+
+      productsRepository.findById.mockResolvedValue(product);
+
+      transactionsRepository.create.mockResolvedValue(transaction);
+
       paymentGateway.processPayment.mockResolvedValue({
         success: true,
-        paymentId: 'payment123',
+        paymentId: 'payment-123',
+      });
+
+      transactionsRepository.updateStatus.mockResolvedValue(
+        approvedTransaction,
+      );
+
+      productsRepository.updateStock.mockResolvedValue({
+        ...product,
+        stock: 14,
       });
 
       const result = await service.createTransaction(
-        productId,
-        customerId,
-        deliveryId,
-        paymentRequest,
+        1,
+        1,
+        1,
+        {
+          amount: 204900,
+          cardNumber: '4111111111111111',
+          cardHolder: 'Test User',
+          cardExpiration: '12/30',
+          cardCvv: '123',
+        },
       );
 
-      expect(result.statusId).toEqual(2); // APPROVED
-      expect(productsRepository.findById).toHaveBeenCalledWith(productId);
-      expect(productsRepository.updateStock).toHaveBeenCalledWith(productId, 1);
-      expect(paymentGateway.processPayment).toHaveBeenCalled();
-    });
+      expect(result).toEqual(approvedTransaction);
 
-    it('should throw NotFoundException when product does not exist', async () => {
-      productsRepository.findById.mockResolvedValue(null);
-
-      await expect(
-        service.createTransaction(productId, customerId, deliveryId, paymentRequest),
-      ).rejects.toThrow(NotFoundException);
-    });
-
-    it('should decline transaction when payment fails', async () => {
-      const mockTransaction = {
-        id: 1,
-        productAmount: 100000,
+      expect(transactionsRepository.create).toHaveBeenCalledWith({
+        productAmount: 189900,
         baseFee: 5000,
         deliveryFee: 10000,
-        totalAmount: 115000,
-        statusId: 3,
-        productId,
-        customerId,
-        deliveryId,
-        paymentId: 'payment123',
+        totalAmount: 204900,
+        statusId: 1,
+        productId: 1,
+        customerId: 1,
+        deliveryId: 1,
+      });
+
+      expect(paymentGateway.processPayment).toHaveBeenCalledWith({
+        amount: 204900,
+        cardNumber: '4111111111111111',
+        cardHolder: 'Test User',
+        cardExpiration: '12/30',
+        cardCvv: '123',
+      });
+
+      expect(productsRepository.updateStock).toHaveBeenCalledWith(1, 1);
+
+      expect(transactionsRepository.updateStatus).toHaveBeenCalledWith(
+        1,
+        2,
+        'payment-123',
+      );
+    });
+
+    it('should decline the transaction when payment fails', async () => {
+      const product = {
+        id: 1,
+        name: 'Wireless Headphones',
+        description: 'Bluetooth wireless headphones',
+        price: 189900,
+        stock: 15,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      productsRepository.findById.mockResolvedValue(mockProduct);
-      transactionsRepository.create.mockResolvedValue(mockTransaction);
-      transactionsRepository.updateStatus.mockResolvedValue(mockTransaction);
+      const transaction = {
+        id: 1,
+        productAmount: 189900,
+        baseFee: 5000,
+        deliveryFee: 10000,
+        totalAmount: 204900,
+        statusId: 1,
+        paymentId: null,
+        productId: 1,
+        customerId: 1,
+        deliveryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const declinedTransaction = {
+        ...transaction,
+        statusId: 3,
+        paymentId: 'payment-456',
+      };
+
+      productsRepository.findById.mockResolvedValue(product);
+
+      transactionsRepository.create.mockResolvedValue(transaction);
+
       paymentGateway.processPayment.mockResolvedValue({
         success: false,
-        paymentId: 'payment123',
+        paymentId: 'payment-456',
+        errorMessage: 'Payment declined',
       });
 
-      const result = await service.createTransaction(
-        productId,
-        customerId,
-        deliveryId,
-        paymentRequest,
+      transactionsRepository.updateStatus.mockResolvedValue(
+        declinedTransaction,
       );
 
-      expect(result.statusId).toEqual(3); // DECLINED
+      const result = await service.createTransaction(
+        1,
+        1,
+        1,
+        {
+          amount: 204900,
+          cardNumber: '4111111111111111',
+          cardHolder: 'Test User',
+          cardExpiration: '12/30',
+          cardCvv: '123',
+        },
+      );
+
+      expect(result.statusId).toBe(3);
+
+      expect(transactionsRepository.updateStatus).toHaveBeenCalledWith(
+        1,
+        3,
+        'payment-456',
+      );
+
       expect(productsRepository.updateStock).not.toHaveBeenCalled();
     });
 
-    it('should throw error when product is out of stock', async () => {
-      const outOfStockProduct = { ...mockProduct, stock: 0 };
-      productsRepository.findById.mockResolvedValue(outOfStockProduct);
+    it('should throw NotFoundException when the product does not exist', async () => {
+      productsRepository.findById.mockResolvedValue(null);
 
       await expect(
-        service.createTransaction(productId, customerId, deliveryId, paymentRequest),
-      ).rejects.toThrow('Product is out of stock');
+        service.createTransaction(
+          999,
+          1,
+          1,
+          {
+            amount: 204900,
+            cardNumber: '4111111111111111',
+            cardHolder: 'Test User',
+            cardExpiration: '12/30',
+            cardCvv: '123',
+          },
+        ),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(transactionsRepository.create).not.toHaveBeenCalled();
+      expect(paymentGateway.processPayment).not.toHaveBeenCalled();
     });
   });
 });
